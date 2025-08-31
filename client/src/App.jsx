@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage";
 
 const App = () => {
+  // just to create a pull request
   return (
     <>
       <SignedIn>
