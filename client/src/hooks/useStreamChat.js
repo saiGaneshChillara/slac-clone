@@ -18,17 +18,21 @@ export const useStreamChat = () => {
   });
 
   useEffect(() => {
+    const client = StreamChat.getInstance(STREAM_API_KEY);
+    let cancelled = false;
+
     const initChat = async () => {
       if (!tokenData?.token || !user) return;
 
       try {
-        const client = StreamChat.getInstance(STREAM_API_KEY);
         await client.connectUser({
           id: user.id,
           name: user.fullName,
           image: user.imageUrl,
-        });
-        setChatClient(client);
+        }, tokenData.token);
+        if (!cancelled) {
+          setChatClient(client);
+        }
       } catch (error) {
         console.log("Error connecting to stream:", error);
         Sentry.captureException(error, {
@@ -47,9 +51,10 @@ export const useStreamChat = () => {
     initChat();
 
     return () => {
-      if (chatClient) chatClient.disconnectUser();
+      cancelled = true;
+      client.disconnectUser();
     }
-  }, [tokenData, user, chatClient]);
+  }, [tokenData, user]);
 
   return { chatClient, isLoading: tokenLoading, error: tokenError };
 };
